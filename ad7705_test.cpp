@@ -169,12 +169,7 @@ int main(int argc, char *argv[])
 
 	// resets the AD7705 so that it expects a write to the communication register
         printf("sending reset\n");
-
-	// we read data in an endless loop and display it
-	// this needs to run in a thread ideally
-	while (1) {
-		
-	  writeReset(fd);
+        writeReset(fd);
 	  ret = gpio_poll(sysfs_fd,1000);
 	  if (ret<1) {
 	    fprintf(stderr,"Poll error on reset %d\n",ret);
@@ -211,6 +206,12 @@ int main(int argc, char *argv[])
 	  if (ret<1) {
 	    fprintf(stderr,"Poll error for data ready %d\n",ret);
 	  }
+
+	// we read data in an endless loop and display it
+	// this needs to run in a thread ideally
+	while (1) {
+		
+	  
 	  // tell the AD7705 to read the data register (16 bits)
 	  writeReg(fd,0x38);
 	  ret = gpio_poll(sysfs_fd,1000);
