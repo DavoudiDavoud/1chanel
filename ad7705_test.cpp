@@ -175,25 +175,49 @@ int main(int argc, char *argv[])
 	while (1) {
 		
 	  writeReset(fd);
+	  ret = gpio_poll(sysfs_fd,1000);
+	  if (ret<1) {
+	    fprintf(stderr,"Poll error on reset %d\n",ret);
+	  }
  	  // tell the AD7705 that the next write will be to the clock register
 	  writeReg(fd,0x20);
+	  ret = gpio_poll(sysfs_fd,1000);
+	  if (ret<1) {
+	    fprintf(stderr,"Poll error on com clock %d\n",ret);
+	  }
 	  // write 00001100 : CLOCKDIV=1,CLK=1,expects 4.9152MHz input clock
 	  writeReg(fd,0x0C);
+	   ret = gpio_poll(sysfs_fd,1000);
+	  if (ret<1) {
+	    fprintf(stderr,"Poll error on clock %d\n",ret);
+	  }
 
 	  // tell the AD7705 that the next write will be the setup register
 	  writeReg(fd,0x10);
+	   ret = gpio_poll(sysfs_fd,1000);
+	  if (ret<1) {
+	    fprintf(stderr,"Poll error on com set %d\n",ret);
+	  }
 	  // intiates a self calibration and then after that starts converting
 	  writeReg(fd,0x40);
+	   ret = gpio_poll(sysfs_fd,1000);
+	  if (ret<1) {
+	    fprintf(stderr,"Poll error on set%d\n",ret);
+	  }
 
 
 	  // let's wait for data for max one second
 	  ret = gpio_poll(sysfs_fd,1000);
 	  if (ret<1) {
-	    fprintf(stderr,"Poll error %d\n",ret);
+	    fprintf(stderr,"Poll error for data ready %d\n",ret);
 	  }
-
 	  // tell the AD7705 to read the data register (16 bits)
 	  writeReg(fd,0x38);
+	  ret = gpio_poll(sysfs_fd,1000);
+	  if (ret<1) {
+	    fprintf(stderr,"Poll error on read command%d\n",ret);
+	  }
+	  
 	  // read the data register by performing two 8 bit reads
 	  int value = readData(fd)-0x8000;
 		fprintf(stderr,"data = %d       \r",value);
